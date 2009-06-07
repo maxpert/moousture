@@ -6,6 +6,8 @@ Copyright:
 	MaXPert [Zohaib Sibt-e-Hassan] (http://www.gnu.org/licenses/gpl-3.0.txt)
 Code & Documentation:
 	Comming soon
+Version: 
+	0.1.1
 */
 
 var Moousture = 
@@ -17,12 +19,18 @@ new Class(
 Moousture.MouseProbe = 
 new Class(
 {
+	Implements: [ Options ],
+	
+	options: {
+				stopEvent: false,
+			},
 	/*
 		constructort mouse movement probe for given target DOM object .e.g. $(body), $('foo')
 	*/
-    initialize: function(target)
+    initialize: function(target, options)
     {
         this.pos = {x:-1, y:-1};
+		this.setOptions(options);
 		
 		/*
 		*	private mouse event tracking callback function
@@ -31,7 +39,10 @@ new Class(
 		{
 			this.pos.x = evt.page.x;
 			this.pos.y = evt.page.y;
-			evt.stopPropagation();
+			if (this.options.stopEvent)
+				evt.stop();
+			else
+				evt.stopPropagation();
 		}
 		
         $(target).addEvent('mousemove', _track.bind(this) );
