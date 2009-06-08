@@ -108,7 +108,7 @@ new Class(
         */
     start: function(prober, eventObj){
 		if( this.timer )
-			return;
+			this.stop();
         this.prober = prober;
         this.cbObject = eventObj;
         this.timer = this._monitor.periodical( this.delay, this );
@@ -127,16 +127,23 @@ new Class(
 Moousture.Recorder = 
 new Class(
 {
+	options: {
+		matcher: null,
+		maxSteps: 8,
+		minSteps: 4
+	},
+	
+	Implements: [Options, Events],
 	/*
 	* construct object
-	* @obj: containing minSteps, maxSteps, (more open for further compatibility).
+	* @obj: containing minSteps, maxSteps, matcher(more open for further compatibility).
 	* initialize the callbacks table and gesture combinations table.
 	*/
     initialize: function(obj){
-        this.maxSteps = 8;
-        this.minSteps = 8;
-		this.matcher = null;
-        $extend(this, $pick(obj, {}) );
+		//Set options
+		this.setOptions(obj);
+		//Bug setOptions gerates a copy of object so any late added gestures won't work if reference is not kept
+		this.options.matcher = obj.matcher;
         this.movLog = [];
     },
 	
@@ -145,12 +152,16 @@ new Class(
 	* @position: current mouse position
 	*/
     onStable: function(position){
-        if( this.movLog.length < this.minSteps ){
+        if( this.movLog.length < this.options.minSteps ){
             this.movLog.empty();
             return;
         }
-        if(this.matcher && this.matcher.match)
-            this.matcher.match(this.movLog);
+		
+        if(this.options.matcher && this.options.matcher.match)
+            this.options.matcher.match(this.movLog);
+		
+		this.fireEvent('complete', [this.movLog]);
+		
         this.movLog.empty();
     },
 	
@@ -160,8 +171,9 @@ new Class(
 	*/
     
     onUnstable: function(position){
-        this.movLog.empty();
+		this.movLog.empty();
         this.movLog.push(position);
+		this.fireEvent('start');
     },
     
 	/*
@@ -170,7 +182,7 @@ new Class(
 	*/
 	
     onMove: function(position){
-        if(this.movLog.length > this.maxSteps)
+        if(this.movLog.length > this.options.maxSteps)
             return;
         this.movLog.push(position);
     }
@@ -180,12 +192,12 @@ new Class(
 Moousture.GestureMatcher = 
 new Class(
 {
+	mCallbacks : [],
+	mGestures : [],
 	/*
 	* construct object
 	*/
     initialize: function(){
-		this.mCallbacks = [];
-		this.mGestures = [];
     },
 	
 	/*
@@ -346,7 +358,7 @@ new Class(
 				minIndex = p;
 			}
 		}
-		
+				
 		this.mCallbacks[minIndex](minDist/mov.length);
 	}
 }
