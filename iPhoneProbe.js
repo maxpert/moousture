@@ -16,9 +16,18 @@ new Class(
 	
 	allowed: false,
 	
-    initialize: function(target)
+	Implements: [Options ],
+	
+	options: {
+				//Action performed while n fingers are touched
+				touched: 1
+			},
+	
+    initialize: function(target, opts)
     {
         this.pos = {x:-1, y:-1};
+		
+		this.setOptions(opts);
 		
 		/*
 		*	private touch event tracking callback function
@@ -26,9 +35,10 @@ new Class(
 		var _tmove = function(evt)
 		{		
 			e = new Event(evt);
-			
-			if(evt.touches.length == 1){
-				e.preventDefault();
+			//Perform record only when required touches have been met
+			if(evt.touches.length == this.options.touched){
+				//Prevent default + stop propogation to upper elements
+				e.stop();
 				this.pos.x = evt.touches[0].pageX;
 				this.pos.y = evt.touches[0].pageY;
 			}
