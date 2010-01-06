@@ -43,7 +43,7 @@ new Class(
 	Implements: [ Options ],
 	
 	options: {
-				stopEvent: false,
+				stopEvent: false
 			},
 	/*
 		constructort mouse movement probe for given target DOM object .e.g. $(body), $('foo')
