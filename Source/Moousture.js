@@ -126,7 +126,7 @@ new Class(
     
     /*
         *	prober: an Object containing method probe returning an object with {x, y} for position parameters
-        *	eventObj: an eventObject containing callback functions - onStable, - onMove and - onUnstable
+        *	eventObj: an eventObject containing callback functions - onStable, - reset, - onMove and - onUnstable
         */
     start: function(prober, eventObj){
 		if( this.timer )
@@ -145,6 +145,62 @@ new Class(
     }
 }
 );
+
+
+Moousture.ManualMonitor = 
+new Class(
+{
+
+	/*
+	*	Constructor
+	*	@delay: delay between probes in ms lower mean more sensitive
+	*	@tHold: threshold of mouse displacement to be ignored while in stable state ( in pixels )
+	*/
+    initialize: function (delay)
+    {
+        this.delay = $pick( delay, 20 );
+    },
+	
+	/*
+	*	Private preodic function to probe the mouse movement
+	*/
+    
+    _monitor: function() {
+        pos = this.prober.probe();
+        this.cbObject.onMove(pos);
+    },
+	
+	/*
+	*	prober: an Object containing method probe returning an object with {x, y} for position parameters
+	*	eventObj: an eventObject containing callback functions - onStable, - reset, - onMove and - onUnstable
+	*/
+    start: function(prober, eventObj){
+		if( this.timer )
+			this.stop();
+        this.prober = prober;
+        this.cbObject = eventObj;
+        this.timer = this._monitor.periodical( this.delay, this );
+		this.cbObject.reset();
+    },
+	
+	/*
+	*	call match will trigger matching algorithm from recorder via onUnstable
+	*/
+	match: function(){
+		if(!this.cbObject)
+			return;
+			
+		this.cbObject.onStable(this.prober.probe());
+	},
+    
+	/*
+	* Stop and delete timer probing
+	*/
+    stop: function(){
+        $clear(this.timer);
+		delete this.timer;
+    }
+});
 
 Moousture.Recorder = 
 new Class(
@@ -186,6 +242,13 @@ new Class(
 		
         this.movLog.empty();
     },
+	
+	/*
+	* reset Move log
+	*/
+	reset: function(){
+		this.movLog.empty();
+	},
 	
 	/*
 	* onUnstable is called by the Monitor first time when the mouse starts movement
@@ -277,6 +340,9 @@ new Class(
     match: function(track){
 		a = this.angelize(track);
 		
+		if(console && console.log)
+			console.log("Mov list", a);
+		
 		if( this.onMatch )
 			this.onMatch(a);
     }
@@ -296,6 +362,7 @@ new Class(
 		
 		minIndex = 0;
 		minDist = this.levenDistance(mov, this.mGestures[0]);
+		
 		
         for(p=1; p<cbLen; p++)
 		{
