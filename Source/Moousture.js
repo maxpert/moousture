@@ -279,10 +279,16 @@ new Class(
 {
 	mCallbacks : [],
 	mGestures : [],
+	
+	options: {},
+	
+	Implements: [Options],
+	
 	/*
 	* construct object
 	*/
-    initialize: function(){
+    initialize: function(opts){
+		this.setOptions(opts);
     },
 	
 	/*
@@ -333,15 +339,12 @@ new Class(
 	
 	/*
 	* match is called after the mouse went through unstable -> moving -> stable stages
-	* @track contains array of {x,y} objects
 	* Key function
 	* - vectorize track
+	* @param track contains array of {x,y} objects
 	*/
     match: function(track){
 		a = this.angelize(track);
-		
-		if(console && console.log)
-			console.log("Mov list", a);
 		
 		if( this.onMatch )
 			this.onMatch(a);
@@ -349,123 +352,40 @@ new Class(
 }
 );
 
-Moousture.LevenMatcher = 
-new Class(
-{
-	Implements: [Moousture.GestureMatcher],
+
+Moousture.Util = {};
+
+/*
+* nPairReduce utility functions that can be used by matchers to reduce the 
+* movement direction vectors into unique quantized direction vectors containing x
+* i.f.f. x is repeated n times continously e.g.
+* [0, 0, 2, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+* with n=1 is [0, 2, 1, 0, 1]
+* with n=2 is [0, 2, 1, 0]
+* @param arr array of moves list
+* @param n length of constant repeatition
+*/
+Moousture.Util.nPairReduce = function(arr, n){
+	var prev = null;
+	var ret = [];
 	
-	onMatch: function(mov){
-		cbLen = this.mCallbacks.length;
+	n = $pick(n, 1);
+	
+	for(var i=0; i<arr.length-n+1; i++){
+		var tmp = arr.slice(i, i+n);
+		var ins = true;
+		for(var j=1; j<tmp.length; j++)
+			if(arr[i] != tmp[j])
+				ins = false;
 		
-		if( cbLen < 1 )
-			return ;
-		
-		minIndex = 0;
-		minDist = this.levenDistance(mov, this.mGestures[0]);
-		
-		
-        for(p=1; p<cbLen; p++)
-		{
-			
-			nwDist = this.levenDistance(mov, this.mGestures[p]);
-			if( nwDist < minDist ){
-				minDist = nwDist;
-				minIndex = p;
-			}
+		if(ins && prev!=arr[i]){
+			ret.push(arr[i]);
+			prev = arr[i];
 		}
-		
-		this.mCallbacks[minIndex](minDist/mov.length);
-	},
-	
-	/*
-	* Fixes applied for:
-	* > 1x1 matrix
-	* > previously it returned original distance+1 as distance 
-	* > [0][0] onwards moves were judged as well
-	* > [undefined] targets handled
-	*/
-	levenDistance: function(v1, v2){
-        d = [];
-        
-        for( i=0; i < v1.length; i++)
-				d[i] = [];
-				
-		if (v1[0] != v2[0])
-			d[0][0] = 1;
-		else
-			d[0][0] = 0;
-
-        for( i=1; i < v1.length; i++)
-            d[i][0] = d[i-1][0] + 1;
-		
-        for( j=1; j < v2.length; j++)
-			d[0][j] = d[0][j-1] + 1;
-            
-        for( i=1; i < v1.length; i++)
-		{
-            for( j=1; j < v2.length; j++)
-            {
-                cost = 0;
-                if (v1[i] != v2[j])
-                    cost = 1;
-                
-                d[i][j] = d[i-1][j] + 1;
-                if ( d[i][j] > d[i][j-1]+1 ) d[i][j] = d[i][j-1] + 1;
-                if ( d[i][j] > d[i-1][j-1]+cost ) d[i][j] = d[i-1][j-1] + cost;
-            }
-		}
-
-        return $pick(d[v1.length-1][v2.length-1], 0);
-    }
-}
-);
-
-
-Moousture.ReducedLevenMatcher = 
-new Class(
-{
-	Implements: [Moousture.LevenMatcher],
-	
-	reduce: function(seq){
-		ret = [];
-		
-		ret.push(seq[0])
-		prev = seq[0];
-		
-		for(i=1;i<seq.length;i++)
-			if(prev != seq[i])
-			{
-				ret.push(seq[i]);
-				prev = seq[i];
-			}
-		
-		return ret;
-	},
-	
-	onMatch: function (mov){
-		mov = this.reduce(mov);
-		
-		cbLen = this.mCallbacks.length;
-		
-		//fix applied for [ undefined ] moves
-		if( cbLen < 1 || !$defined(mov[0]))
-			return ;
-		
-		minIndex = 0;
-		minDist = this.levenDistance(mov, this.mGestures[0]);
-		
-        for(p=1; p<cbLen; p++)
-		{
-			
-			nwDist = this.levenDistance(mov, this.mGestures[p]);
-			
-			if( nwDist < minDist ){
-				minDist = nwDist;
-				minIndex = p;
-			}
-		}
-				
-		this.mCallbacks[minIndex](minDist/mov.length);
 	}
+	
+	if(console && console.log)
+		console.log(arr,n, ret);
+	
+	return ret;
 }
-);
