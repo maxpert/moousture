@@ -4,6 +4,8 @@
   <title>Moousture Demo</title>
   <script src="script/mootools.js"></script>
   <script src="../Source/Moousture.js"></script>
+  <script src="../Source/LevenMatcher.js"></script>
+  <script src="../Source/JaroMatcher.js"></script>
   
   
   <style>
@@ -23,15 +25,15 @@
     var recorder = null;
     
     function ccwCircle(error){
-		$('errors').set('html', 'Circular gesture error'+error);
+		$('errors').set('html', 'Circular gesture error '+error);
     }
     
     function elGest(error){
-        $('errors').set('html', 'L gesture error'+error);
+        $('errors').set('html', 'L gesture error '+error);
     }
 	
-	function invElGest(error){
-		$('errors').set('html', 'reverse L gesture error'+error);
+	function veeGest(error){
+		$('errors').set('html', 'V gesture error '+error);
 	}
 	
 	function square(error){
@@ -94,15 +96,16 @@
 	}
   
     function domReadyHook(){
-        gstr = new Moousture.ReducedLevenMatcher();
+        gstr = new Moousture.JaroMatcher();
     	probe = new Moousture.MouseProbe($(document));
-    	recorder = new Moousture.Recorder({maxSteps: 20, minSteps: 2, matcher: gstr});
-    	monitor = new Moousture.ManualMonitor(100, 4);
+    	recorder = new Moousture.Recorder({maxSteps: 100, minSteps: 2, matcher: gstr});
+    	monitor = new Moousture.ManualMonitor(20, 4);
     	gstr.addGesture([3,2,1,0,7,6,5,4], ccwCircle);
-		gstr.addGesture([1,3,5,7,3], ccwCircle);
+		gstr.addGesture([1,3,4,5,6,7,0,2], ccwCircle);
 		gstr.addGesture([2,0,4,6], square);
         gstr.addGesture([2,0], elGest);
-		gstr.addGesture([2,4], invElGest);
+		gstr.addGesture([1,7], veeGest);
+		gstr.addGesture([7,1], veeGest);
         
 		$(document).addEvent('mousedown', startListening );
 		$(document).addEvent('mouseup', stopListening );
