@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Moousture</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <script src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools-yui-compressed.js"></script>
+  <script src="script/Moousture.js"></script>
+  <script src="script/LevenMatcher.js"></script>
+  <script src="script/iPhoneProbe.js"></script>
+  
+  <script> 
+  /*
+Hi developer see domReadyHook below to get started
+*/
+function ccwCircle(error){
+	if(error*10 >= 6)
+		return ;
+	
+	var myEffect = new Fx.Morph('menu', {
+					duration: 1500, transition: Fx.Transitions.Elastic.easeOut
+					});
+	var pos = probe.probe();
+	
+	monitor.stop();
+	
+	myEffect.start({
+			'left': [pos.x - 100, pos.x - 100],
+			'top': [pos.y+200, pos.y-80],
+			'opacity': [0, 1]
+			});
+
+	startgMonitor.delay(500);
+}
+
+
+function triMov(error){
+	if(error*10 >= 8)
+		return ;
+	
+	var myEffect = new Fx.Morph('menu', {
+					duration: 1500, transition: Fx.Transitions.Elastic.easeOut
+					});
+	var pos = probe.probe();
+	
+	monitor.stop();
+	
+	myEffect.start({
+			'left': [pos.x - 100, pos.x - 100],
+			'top': [pos.y+200, pos.y-80],
+			'opacity': [0, 1]
+			});
+
+	startgMonitor.delay(500);
+}
+
+function swipeMouse(error){
+	if (error >= 1)
+		return;
+	new Fx.Morph('menu', {duration: 500}).start(
+										{
+										'opacity': 0
+										}
+										).chain(
+												function(){
+													$('menu').setStyle('left', 0).setStyle('top',0);
+												}
+										);
+	startgMonitor();
+}
+
+var monitor = null;
+var probe = null;
+var swipeProbe = null, swipeRecorder = null, swipeMatcher = null, swipeMonitor = null;
+var recorder = null;
+
+function startgMonitor()
+{
+	monitor.start( probe, recorder );
+}
+
+function rightSwipe(error){
+	$('swipeArea').set('html',"Swiped right with error = "+error);
+}
+
+function leftSwipe(error){
+	$('swipeArea').set('html',"Swiped left with error = "+error);
+}
+
+function domReadyHook(){
+	try{
+		gstr = new Moousture.ReducedLevenMatcher({reduceConsistency: 1});
+		probe = new Moousture.iPhoneProbe($(document));
+		recorder = new Moousture.Recorder({maxSteps: 20, minSteps: 8, matcher: gstr});
+		monitor = new Moousture.Monitor(20, 1);
+		//CCW circle motion vectors
+		gstr.addGesture([3,2,1,0,7,6,5,4], ccwCircle);
+		//Make a triangle
+		gstr.addGesture([1, 7, 1, 7], triMov);
+		//Zig zag swipe vectors
+		gstr.addGesture([4, 0, 4, 0], swipeMouse);
+
+		swipeProbe = new Moousture.iPhoneProbe($('swipeArea'));
+		swipeMonitor = new Moousture.Monitor(20, 1);
+		swipeMatcher = new Moousture.ReducedLevenMatcher({reduceConsistency: 4});
+		swipeRecorder = new Moousture.Recorder({maxSteps: 50, minSteps: 2, matcher: swipeMatcher});
+
+		swipeMatcher.addGesture([0], rightSwipe);
+		swipeMatcher.addGesture([4], leftSwipe);
+
+		monitor.start(probe, recorder);
+		swipeMonitor.start(swipeProbe, swipeRecorder);
+
+		$('menu').setStyles(
+							{
+							'opacity': 0,
+							'position': 'absolute',
+							'overflow': 'hidden'
+							}
+							);
+	}catch(e){
+		alert('error'+e);
+	}
+}
+window.addEvent( 'domready', domReadyHook );
+  </script>
+  
+  <link rel="stylesheet" type="text/css" href="style.css">  
+  <link rel="stylesheet" type="text/css" href="notimoo-v1.1.css">
+</head>
+
+
+<body>
+
+<b> Use one finger to perform gesture... </b>
+
+<ul>
+<li> Do a counter clock wise rotation to show up menu (from 9pm to 9am reverse you know).</li>
+<li> Draw a W to activate menu as well.</li>
+<li> Zig Zag motion to hide it (left right left right).</li>
+</ul>
+
+
+<div id="swipeArea" style="background-color: #CC9933; margin: 5px; padding: 20px 10px; font-size: 20px;"> Swipe </div>
+
+
+<div id="menu" style="padding: 20px;"> 
+<a href="http://code.google.com/p/moousture/"> <img src="images/icon_download.png"> </a>
+<a href="#section_tutorial"> <img src="images/icon_docs.png"> </a>
+</div>
+
+
+</body>
+</html>

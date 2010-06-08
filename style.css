@@ -1,0 +1,78 @@
+body {
+	font: 12px Arial, Tahoma, sans-serif;
+	color: #222;
+	margin: 0;
+	padding: 0;
+	background: #eee;
+	border: 0;
+}
+
+a:link, a:visited {
+	color: #e0542f;
+	border: 0;
+}
+
+a:hover, a:active {
+	color: #5f7690;
+	border: 0;
+}
+
+img{
+	border: 0;
+}
+
+h1, h2, h3, h4, h5, p, blockquote {
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	font-size: 24px;
+	padding: 5px 0;
+}
+
+h2 {
+	font-size: 20px;
+	padding: 4px 0;
+}
+
+h3 {
+	font-size: 16px;
+	padding: 3px 0;
+}
+
+h4 {
+	font-size: 14px;
+	padding: 2px 0;
+}
+
+p {
+	padding: 5px 0;
+}
+
+.clearer{
+	clear: both;
+	display: block;
+	visibility: hidden;
+}
+
+#logo{
+	float: left;
+	width: 236px;
+	height: 63px;
+	background: url(images/logo.png) no-repeat;
+	margin: 20px;
+}
+
+#slideShow{
+	float: right;
+	width: 542px;
+	/*height: 146px;*/
+	overflow: hidden;
+	margin: 20px;
+	position: relative;
+}
+
+#bodyArea{
+	margin: 20px;
+}

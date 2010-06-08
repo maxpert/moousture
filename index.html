@@ -1,100 +1,340 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Moousture</title>
 
-	<title>maxpert/moousture @ GitHub</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools-yui-compressed.js"></script>
+  <script src="script/Moousture.js"></script>
+  <script src="script/LevenMatcher.js"></script>
+  <script src="script/JaroMatcher.js"></script>
+  <script src="script/notimoo-v1.1.js"></script>
+  
+  <script> 
+  /*
+    Hi developer see domReadyHook below to get started
+    */
 	
-	<style type="text/css">
-		body {
-  		margin-top: 1.0em;
-  		background-color: #0b1846;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #ffffff;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #f4e7b9; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #f4e7b9; }
-    h3 { text-align: center; color: #f4e7b9; }
-    a { color: #f4e7b9; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-	</style>
+	var displayedHide = false;
 	
+function ccwCircle(error){
+	//console.log("Circle: ", error);
+	if(error > 0.20)
+		return ;
+	
+	var myEffect = new Fx.Morph('menu', {
+					duration: 1500, transition: Fx.Transitions.Elastic.easeOut
+					});
+	var pos = probe.probe();
+	
+	monitor.stop();
+	
+	myEffect.start({
+			'left': [pos.x - 100, pos.x - 100],
+			'top': [pos.y+200, pos.y-80],
+			'opacity': [0, 1]
+			});
+			
+
+	if(!displayedHide) // Showing a simple notification
+		notimooManager.show({
+			title: 'To hide menu',
+			sticky: true,
+			message: 'To hide the menu use the shake gesture (left, right, left, right) <br /> <img src="./images/hide-tip.png" height="75" width="150" alt="" /> <br/>'
+		});
+	displayedHide = true;
+	startgMonitor.delay(1000);
+}
+
+
+function swipeMouse(error){
+	//if(console && console.log) console.log("Shake: ", error);
+	if (error >= 1)
+		return;
+	new Fx.Morph('menu', {duration: 500}).start(
+										{
+										'opacity': 0
+										}
+										).chain(
+												function(){
+													$('menu').setStyle('left', 0).setStyle('top',0);
+												}
+										);
+	startgMonitor();
+}
+
+var monitor = null;
+var probe = null;
+var recorder = null;
+var notimooManager = null;
+
+function startgMonitor()
+{
+	monitor.start( probe, recorder );
+}
+
+function domReadyHook(){
+	gstr = new Moousture.JaroMatcher({reduceConsistency: 1});
+	probe = new Moousture.MouseProbe($(document));
+
+	recorder = new Moousture.Recorder({maxSteps: 50, minSteps: 8, matcher: gstr});
+	monitor = new Moousture.Monitor(10, 1);
+	
+	//CCW circle motion vectors
+	gstr.addGesture([5,4,3,2,1,0,7,6], ccwCircle);
+	gstr.addGesture([7,0,1,2,3,4,5,6], ccwCircle);
+	//Zig zag swipe vectors
+	gstr.addGesture([4, 0, 4, 0], swipeMouse);
+	
+	
+	monitor.start(probe, recorder);
+	$('menu').setStyles(
+						{
+						'opacity': 0,
+						'position': 'absolute',
+						'overflow': 'hidden'
+						}
+						);
+	
+	notimooManager = new Notimoo({width: '200px', locationVType: 'top'});
+}
+window.addEvent( 'domready', domReadyHook );
+  </script>
+  
+  <link rel="stylesheet" type="text/css" href="style.css">  
+  <link rel="stylesheet" type="text/css" href="notimoo-v1.1.css">
 </head>
 
+
 <body>
-  <a href="http://github.com/maxpert/moousture"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
-  <div id="container">
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+try {
+_uacct = "UA-10446748-1";
+urchinTracker();
+} catch(err) {}</script>
 
-    <div class="download">
-      <a href="http://github.com/maxpert/moousture/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/maxpert/moousture/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+
+<div id="topArea">
+<div id="logo"> </div>
+<div id="slideShow"> <img src="images/rotate.png" /> </div>
+<div class="clearer"></div>
+</div>
+
+<div style="position: absolute; left: 50px; top: 120px;"> 
+<script type="text/javascript">
+var twtTitle  = "Moousture the mouse gesture *X* for web 2.0: ";
+var twtUrl    = 'http://bit.ly/moousture';
+var maxLength = 140 - (twtUrl.length + 1);
+if (twtTitle.length > maxLength) {
+twtTitle = twtTitle.substr(0, (maxLength - 3))+'...';
+}
+var twtLink = 'http://twitter.com/home?status='+encodeURIComponent(twtTitle + ' ' + twtUrl);
+document.write('<a href="'+twtLink+'" target="_blank"'+'><img src="./images/tweet.png"  border="0" alt="Tweet This!" /'+'><'+'/a>');
+</script>
+</div>
+
+<div id="bodyArea">
+<h1>What?</h1>
+
+
+<p> A mouse gesture library written <b>soley in javascript</b> with power and flexiblity to mould
+itself for you. Implemented on Mootools following the Object Oriented
+standards. Library is aimed to set out a future framework for mouse
+guesters for any browser including modern mobile devices. </p>
+
+
+<h1>How?</h1>
+
+
+<p> Its based on simplicity. Three major concepts. </p>
+
+
+<ul>
+
+
+  <li> A probe, which probes the pointing device. Currently there
+is a Moousture.MouseProbe (P.S. It already supports iPhone).</li>
+
+
+  <li> A&nbsp;monitor, which tests the stability of probed
+device on given intervals and accordingly notifies Moousture events
+(onStable, onUnstable, onMove).</li>
+
+
+  <li> A Moousture recorder class that records the mouse
+movements and invoke the guesture object passed to it.</li>
+
+
+</ul>
+
+
+
+<h1> Easy yet powerful </h1>
+
+
+<p> Each class allows you to tune the way gestures for yourself.
+For example:<br>
+
+
+</p>
+
+
+<div style="padding: 5px; background: white none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial;">
+<b> new Moousture.Monitor(20, 2); </b>
+<p> Creates Monitor which polls probe position after every 20ms
+and allows error of 2px to be ignored (not causing to trigger any event)</p>
+
+
+<b> new Moousture.MouseProbe($(document)); </b>
+<p> Creates a mouse probe for entire document. Note the power you
+have to probe any DOM object</p>
+
+
+<b> new Moousture.Recorder({maxSteps: 20, minSteps: 8}); </b>
+<p> Creates a Moousture event class that can keep track of
+maxSteps mouse movements at maximum. A gesture movment with movements
+less that minSteps would be simply ignored.</p>
+
+
+</div>
+
+
+To start probing and recieve gesture events one can simply call
+.start(probeObj, mooustureObj) of StabilityMonitor. Notice that the
+gestures must be registered with callback functions first for recieving
+gesture completion events.
+<p></p>
+
+<h1>More demos</h1>
+
+
+<p>
+<ul>
+	<li><a href="iphone.html"> A Demo for iPhone users</a></li>
+</ul>
+</p>
+
+
+<h1><a id="section_tutorial">Tutorial</a></h1>
+
+
+<p>Its super easy!<br>
+
+
+</p>
+
+
+<div style="padding: 5px; background: white none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial;">
+<ul>
+  <li>Create a guesture matcher, currently there are only two gesture
+objects Moousture.LevenMatcher, and Moousture.ReducedLevenMatcher.
+    <pre class="javascript">gstr = <span class="kw2">new</span> Moousture.<span class="me1">ReducedLevenMatcher</span><span class="br0">(</span><span class="br0">)</span>;</pre>
+  </li>
+  <li>Add gesture vectors to matcher object, (see details below in Create your own gestures).<br>
+    <pre class="javascript">gstr.<span class="me1">addGesture</span><span class="br0">(</span><span class="br0">[</span><span class="nu0">3</span>,<span class="nu0">2</span>,<span class="nu0">1</span>,<span class="nu0">0</span>,<span class="nu0">7</span>,<span class="nu0">6</span>,<span class="nu0">5</span>,<span class="nu0">4</span><span class="br0">]</span>, ccwCircle<span class="br0">)</span>;<span style="font-family: Arial,Tahoma,sans-serif;"></span></pre>
+  </li>
+  <li>Guesture callback function takes one parameter error recieved from
+matching algorithm. Threshold that value (if required) to make your
+gestures more sleek.<br>
+    <div id="code" class="syntax">
+    <pre class="javascript"><ol><li class="li1"><div class="de1"><span class="kw2">function</span> ccwCircle<span class="br0">(</span>error<span class="br0">)</span><span class="br0">{</span></div></li><li class="li2"><div class="de2">	<span class="kw1">if</span><span class="br0">(</span>error &gt;= <span class="nu0">0.6</span><span class="br0">)</span></div></li><li class="li1"><div class="de1">		<span class="kw1">return</span> ;</div></li><li class="li2"><div class="de2">...</div></li><li class="li1"><div class="de1"><span class="br0">}<br></span></div></li></ol></pre>
     </div>
-
-    <h1><a href="http://github.com/maxpert/moousture">moousture</a>
-      <span class="small">by <a href="http://github.com/maxpert">maxpert</a></span></h1>
-
-    <div class="description">
-      A mouse gesture library written soley in javascript with power and flexiblity to mould itself for you. Implemented on Mootools following the Object Oriented standards. Library is aimed to set out a future framework for mouse guesters for any browser including modern mobile devices.
-    </div>
-
-    <h2>License</h2>
-<p>Copyright (c) 2007 Zohaib Sibt-e-Hassan
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.</p>
-<h2>Authors</h2>
-<p>maxpert (zohaib.hassan@gmail.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Zohaib Sibt-e-Hassan (zohaib.hassan@gmail.com)<br/>      </p>
+  </li>
+  <li>Create a probe object that will probe the pointing device. Currently
+there is a mouse probe that take the $(element) to probe for. So
+passing a div id will cause the probe to trigger events only when they
+occur on the passed DOM element.<br>
+    <pre class="javascript">probe = <span class="kw2">new</span> Moousture.<span class="me1">MouseProbe</span><span class="br0">(</span>$<span class="br0">(</span>document<span class="br0">)</span><span class="br0">)</span>;</pre>
+  </li>
+  <li><span style="color: rgb(204, 0, 0);"></span>Create a recoder
+object to record the movement , maxSteps and minSteps in options object
+will specify the maximum and minimum number of steps to be recorded,
+and macher is required matcher object to trigger the appropriate
+gesture.<br>
+    <pre class="javascript">recorder = <span class="kw2">new</span> Moousture.<span class="me1">Recorder</span><span class="br0">(</span><span class="br0">{</span>maxSteps: <span class="nu0">20</span>, minSteps: <span class="nu0">8</span>, matcher: gstr<span class="br0">}</span><span class="br0">)</span>;</pre>
+  </li>
+  <li>Create a monitor specifying the interval to poll and the amount of error allowed for gesture in pixels.<br>
+    <pre class="javascript">monitor = <span class="kw2">new</span> Moousture.<span class="me1">Monitor</span><span class="br0">(</span><span class="nu0">30</span>, <span class="nu0">2</span><span class="br0">)</span>;</pre>
+  </li>
+  <li>Finally start the monitor.<br>
+    <pre class="javascript">monitor.<span class="me1">start</span><span class="br0">(</span>probe, recorder<span class="br0">)</span>;<span style="font-family: Arial,Tahoma,sans-serif;"></span></pre>
+  </li>
+  <li><span style="font-family: Arial,Tahoma,sans-serif;">You can stop the gesture triggering any time by calling .stop() of monitor object.<br>
+    </span>
+    <pre class="javascript">monitor.<span class="me1">stop</span><span class="br0">(</span><span class="br0">)</span>;</pre>
+  </li>
+</ul>
+</div>
 
 
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/maxpert/moousture/zipball/master">zip</a> or
-      <a href="http://github.com/maxpert/moousture/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/maxpert/moousture</pre>
-    </p>
+<p></p>
 
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/maxpert/moousture">maxpert/moousture</a>
-    </div>
 
-  </div>
+<h2> Create your own gestures </h2>
 
-  
+
+<center> <img src="images/direction_pad.png"> </center>
+
+
+<p> Above image gives you all the power to make your own
+gestures. So for example one can make a gesture for letter W as [1, 7,
+1, 7]. This gesture registration is even more simple. </p>
+
+
+<div style="padding: 5px; background: white none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial;">
+matcherObj= new Moousture.ReducedLevenMatcher();<br>
+
+
+function wGuessed(error){<br>
+
+
+...<br>
+
+
+}<br>
+
+
+<br>
+
+
+matcherObj.addGesture([1, 7, 1, 7], wGuessed);<br>
+
+
+</div>
+
+
+<p></p>
+
+
+<h1> Download </h1>
+<center> <h2> <a href="http://github.com/maxpert/moousture/tree/master"> Moousture 1.0 </a> </h2> </center> <br/>
+<center> <h2> <a href="http://github.com/maxpert/moousture/tree/version2"> Moousture 2.0 Pre-beta </a> </h2> </center> <br/>
+
+<h1> Issues </h1>
+
+
+<p> 
+In case of bugs, wishlist, issues please report to <a href="http://github.com/maxpert/moousture/issues">Issue tracker</a>
+</p>
+
+
+</div>
+
+
+<div id="footerArea">
+<center> Copyright MaXPert (Zohaib Sibt-e-Hassan). </center>
+
+
+</div>
+
+
+<div id="menu" style="padding: 20px;"> 
+<a href="http://github.com/maxpert/moousture/tree/master"> <img src="images/icon_download.png"> </a>
+<a href="#section_tutorial"> <img src="images/icon_docs.png"> </a>
+</div>
+
+
 </body>
 </html>
