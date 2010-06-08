@@ -60,11 +60,12 @@ new Class(
 		{
 			this.pos.x = evt.page.x;
 			this.pos.y = evt.page.y;
-			if (this.options.stopEvent)
+			if (this.options.stopEvent){
 				evt.stop();
-			else
+			}else{
 				evt.stopPropagation();
-		}
+			}
+		};
 		
         // Compatibility patch
         $(target).addEvent('mousemove', _track.bind(this) );
@@ -76,7 +77,7 @@ new Class(
 	*/
     probe: function ()
     {
-        pos = { };
+        var pos = { };
 		$extend(pos, this.pos);
         return pos;
     }
@@ -108,16 +109,18 @@ new Class(
         
         if ( Math.abs(pos.x - this.prev.x) < this.thresh && Math.abs( pos.y - this.prev.y ) < this.thresh )
         {
-            if( !this.wasStable )
+            if( !this.wasStable ){
                 this.cbObject.onStable(pos);
+			}
             this.wasStable = true;
         }
         else
         {
-            if( this.wasStable )
+            if( this.wasStable ){
                 this.cbObject.onUnstable(pos);
-            else
+            }else{
                 this.cbObject.onMove(pos);
+			}
             this.wasStable = false;
         }
         
@@ -129,8 +132,9 @@ new Class(
         *	eventObj: an eventObject containing callback functions - onStable, - reset, - onMove and - onUnstable
         */
     start: function(prober, eventObj){
-		if( this.timer )
-			this.stop();
+		if( this.timer ){ 
+			this.stop(); 
+		}
         this.prober = prober;
         this.cbObject = eventObj;
         this.timer = this._monitor.periodical( this.delay, this );
@@ -180,8 +184,7 @@ new Class(
 	*	eventObj: an eventObject containing callback functions - onStable, - reset, - onMove and - onUnstable
 	*/
     start: function(prober, eventObj){
-		if( this.timer )
-			this.stop();
+		if( this.timer ){ this.stop(); }
         this.prober = prober;
         this.cbObject = eventObj;
         this.timer = this._monitor.periodical( this.delay, this );
@@ -192,8 +195,9 @@ new Class(
 	*	call match will trigger matching algorithm from recorder via onUnstable
 	*/
 	match: function(){
-		if(!this.cbObject)
+		if(!this.cbObject){
 			return;
+		}
 			
 		this.cbObject.onStable(this.prober.probe());
 	},
@@ -240,8 +244,9 @@ new Class(
             return;
         }
 		
-        if(this.options.matcher && this.options.matcher.match)
+        if(this.options.matcher && this.options.matcher.match){
             this.options.matcher.match(this.movLog);
+		}
 		
 		this.fireEvent('complete', [this.movLog]);
 		
@@ -272,8 +277,9 @@ new Class(
 	*/
 	
     onMove: function(position){
-        if(this.movLog.length > this.options.maxSteps)
+        if(this.movLog.length > this.options.maxSteps){
             return;
+		}
         this.movLog.push(position);
     }
 }
@@ -320,10 +326,11 @@ new Class(
         */
     
     angelize: function(track){
-        ret = [];
+        var ret = [];
         
-        for( i = 1; i< track.length - 1; i++ )
+        for(var i = 1; i< track.length - 1; i++ ) {
             ret.push( this.getAngles( track[i], track[i+1] ) );
+		}
         return ret;
     },
     
@@ -333,11 +340,11 @@ new Class(
         * @output:  angle in radians
         */
     getAngles: function(oldP, newP){
-        diffx=newP.x-oldP.x;
-        diffy=newP.y-oldP.y;
-        a = Math.atan2(diffy,diffx) + Math.PI/8;
+        var diffx=newP.x-oldP.x;
+        var diffy=newP.y-oldP.y;
+        var a = Math.atan2(diffy,diffx) + Math.PI/8;
         
-        if( a < 0 ) a = a + (2 * Math.PI);
+        if( a < 0 ){ a = a + (2 * Math.PI); }
         
         a = Math.floor( a /(2*Math.PI)*360 ) / 45;
         return Math.floor( a );
@@ -358,10 +365,11 @@ new Class(
 	* @param track contains array of {x,y} objects
 	*/
     match: function(track){
-		a = this.angelize(track);
+		var a = this.angelize(track);
 		
-		if( this.onMatch )
+		if( this.onMatch ){
 			this.onMatch(a);
+		}
     }
 }
 );
@@ -388,9 +396,11 @@ Moousture.Util.nPairReduce = function(arr, n){
 	for(var i=0; i<arr.length-n+1; i++){
 		var tmp = arr.slice(i, i+n);
 		var ins = true;
-		for(var j=1; j<tmp.length; j++)
-			if(arr[i] != tmp[j])
+		for(var j=1; j<tmp.length; j++){
+			if(arr[i] != tmp[j]){
 				ins = false;
+			}
+		}
 		
 		if(ins && prev!=arr[i]){
 			ret.push(arr[i]);
@@ -402,4 +412,4 @@ Moousture.Util.nPairReduce = function(arr, n){
 		//console.log(arr,n, ret);
 	
 	return ret;
-}
+};

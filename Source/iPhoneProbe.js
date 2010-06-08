@@ -47,7 +47,7 @@ new Class(
 		*/
 		var _tmove = function(evt)
 		{		
-			e = new Event(evt);
+			var e = new Event(evt);
 			//Perform record only when required touches have been met
 			if(evt.touches.length == this.options.touched){
 				//Prevent default + stop propogation to upper elements
@@ -66,7 +66,7 @@ new Class(
 	*/
     probe: function ()
     {
-        pos = { };
+        var pos = { };
 		$extend(pos, this.pos);
         return pos;
     }

@@ -10,8 +10,9 @@ Moousture.JaroMatcher = new Class(
 		mov = Moousture.Util.nPairReduce(mov, this.options.reduceConsistency);
 		var cbLen = this.mCallbacks.length;
 		
-		if( cbLen < 1 )
+		if( cbLen < 1 ){
 			return ;
+		}
 		
 		var minIndex = 0;
 		var minDist = 1 - this.jaroDistance(mov, this.mGestures[0]);
@@ -32,27 +33,30 @@ Moousture.JaroMatcher = new Class(
 	
 	jaroDistance: function(str1, str2){
 		var lastMax = ((str1.length > str2.length)?str1.length:str2.length);
-		var allowedRange = lastMax>>1;
+		var allowedRange = lastMax/2; // Optimized
 		
 		//initialize array to false
-		var found1 = new Array();
-		var found2 = new Array();
-		for(var i=0; i<str2.length; i++){
-			if(i<str1.length)
+		var found1 = [], 
+			found2 = [],
+			i=0,j=0;
+			
+		for(i=0; i<str2.length; i++){
+			if(i<str1.length){
 				found1.push(false);
+			}
 			found2.push(false);
 		}
 		
 		var common = 0;
 		
-		for(var i=0; i<str1.length; i++){
+		for(i=0; i<str1.length; i++){
 			var first = i-allowedRange;
 			var last = i+allowedRange;
 			
-			if(last>lastMax) last = lastMax;
-			if(first<0) first = 0;
+			if(last>lastMax){ last = lastMax;}
+			if(first<0){ first = 0;}
 			
-			for(var j=first; j<last; j++){
+			for(j=first; j<last; j++){
 				if( !found2[j] && str1[i] == str2[j] ){
 					common++;
 					found1[i] = found2[j] = true;
@@ -61,21 +65,23 @@ Moousture.JaroMatcher = new Class(
 			}
 		}
 		
-		if(common == 0)
+		if(common === 0){
 			return 0;
+		}
 		
 		var nextFound = 0;
 		var transpos = 0;
 		
-		for(var i=0;i<found1.length;i++){
+		for(i=0;i<found1.length;i++){
 			if(found1[i]){
-				for(var j=nextFound;j<found2.length;j++){
+				for(j=nextFound;j<found2.length;j++){
 					if(found2[j]){
 						nextFound = j+1;
 						if(str1[i] != str2[j]){
 							transpos += 0.5;
-						}else
+						}else{
 							break;
+						}
 					}
 				}
 			}
@@ -83,11 +89,9 @@ Moousture.JaroMatcher = new Class(
 		
 		var ret = (common/str1.length + common/str2.length + (common-transpos)/common)/3;
 		
-		if(ret>1)
+		if(ret>1){
 			ret = 1;
-		
-		//if(console && console.log)
-		//	console.log(str1,str2,"Jaro", ret);
+		}
 		
 		return ret;
     }
