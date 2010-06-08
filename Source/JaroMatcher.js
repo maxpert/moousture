@@ -86,8 +86,8 @@ Moousture.JaroMatcher = new Class(
 		if(ret>1)
 			ret = 1;
 		
-		if(console && console.log)
-			console.log(str1,str2,"Jaro", ret);
+		//if(console && console.log)
+		//	console.log(str1,str2,"Jaro", ret);
 		
 		return ret;
     }

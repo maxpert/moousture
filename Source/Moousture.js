@@ -104,7 +104,7 @@ new Class(
 	*/
     
     _monitor: function() {
-        pos = this.prober.probe();
+        var pos = this.prober.probe();
         
         if ( Math.abs(pos.x - this.prev.x) < this.thresh && Math.abs( pos.y - this.prev.y ) < this.thresh )
         {
@@ -146,7 +146,12 @@ new Class(
 }
 );
 
-
+/*
+ * Manual monitor class that can be used to start monitoring manually and stopping
+ * them manually. The main crux of whole class is match subroutine (calling start won't fire matched
+ * callbacks; instead only probe recording will be carried out); ASAP match() is called the
+ * system will match the guesture and fire appropriate callback
+ */
 Moousture.ManualMonitor = 
 new Class(
 {
@@ -166,7 +171,7 @@ new Class(
 	*/
     
     _monitor: function() {
-        pos = this.prober.probe();
+        var pos = this.prober.probe();
         this.cbObject.onMove(pos);
     },
 	
@@ -274,9 +279,18 @@ new Class(
 }
 );
 
+/*
+ * Base class for any guester macthing algorithm 
+ * 
+ */
+
 Moousture.GestureMatcher = 
 new Class(
 {
+	/*
+	 * mCallbacks callback functions to invoke on corresponding indicies to mGuesters
+	 * mGuesters containing guesture strings
+	 */
 	mCallbacks : [],
 	mGestures : [],
 	
@@ -384,8 +398,8 @@ Moousture.Util.nPairReduce = function(arr, n){
 		}
 	}
 	
-	if(console && console.log)
-		console.log(arr,n, ret);
+	//if(console && console.log)
+		//console.log(arr,n, ret);
 	
 	return ret;
 }

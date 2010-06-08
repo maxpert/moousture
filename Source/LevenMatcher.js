@@ -64,8 +64,8 @@ new Class(
             }
 		}
 		
-		if(console && console.log)
-			console.log(v1,v2,"String edit", d[v1.length-1][v2.length-1]);
+		//if(console && console.log)
+		//	console.log(v1,v2,"String edit", d[v1.length-1][v2.length-1]);
 
         return $pick(d[v1.length-1][v2.length-1], 0);
     }

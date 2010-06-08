@@ -96,7 +96,7 @@
 	}
   
     function domReadyHook(){
-        gstr = new Moousture.JaroMatcher();
+        gstr = new Moousture.JaroMatcher({reduceConsistency: 1});
     	probe = new Moousture.MouseProbe($(document));
     	recorder = new Moousture.Recorder({maxSteps: 100, minSteps: 2, matcher: gstr});
     	monitor = new Moousture.ManualMonitor(20, 4);
@@ -105,7 +105,9 @@
 		gstr.addGesture([2,0,4,6], square);
         gstr.addGesture([2,0], elGest);
 		gstr.addGesture([1,7], veeGest);
-		gstr.addGesture([7,1], veeGest);
+		gstr.addGesture([2,7], veeGest);
+		gstr.addGesture([1,6], veeGest);
+		
         
 		$(document).addEvent('mousedown', startListening );
 		$(document).addEvent('mouseup', stopListening );

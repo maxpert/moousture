@@ -10,6 +10,8 @@ How to use
 Create a guesture matcher, currently there are only two gesture objects Moousture.LevenMatcher, and Moousture.ReducedLevenMatcher.
 
 	var gstr = new Moousture.ReducedLevenMatcher();
+	
+_Note: v2 has new matcher named JaroMatcher it's better than ReducedLevenMatcher and you can use it by including file named JaroMatcher.js_
 
 Add gesture vectors to matcher object, (see details below in Create your own gestures).
 
