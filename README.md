@@ -1,3 +1,5 @@
+**Note: I am not actively maintaing this project anymore.**
+
 Moousture
 =========
 
